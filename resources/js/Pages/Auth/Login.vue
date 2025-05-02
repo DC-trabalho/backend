@@ -1,8 +1,8 @@
 <script setup>
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -41,12 +41,8 @@ const redirectToGoogle = () => {
 <template>
 
     <Head title="Log in" />
-
+    <AppLayout>
     <AuthenticationCard>
-        <template #logo>
-            <AuthenticationCardLogo />
-        </template>
-
         <InputError :message="authError" class="mb-4 text-center" />
 
         <button @click="redirectToGoogle"
@@ -93,4 +89,5 @@ const redirectToGoogle = () => {
             </div>
         </form>
     </AuthenticationCard>
+    </AppLayout>
 </template>

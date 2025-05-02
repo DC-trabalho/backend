@@ -5,11 +5,11 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
+    return Inertia::render('Home', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
     ]);
-});
+})->name('home');
 
 Route::middleware([
     'auth:sanctum',
@@ -21,11 +21,5 @@ Route::middleware([
     })->name('dashboard');
 });
 
-use App\Http\Controllers\MercadoPagoController; 
-
-Route::get('/checkout', [MercadoPagoController::class, 'checkout'])->name('mercadopago.checkout');
-Route::get('/checkout/success', [MercadoPagoController::class, 'success'])->name('mercadopago.success');
-Route::get('/checkout/pending', [MercadoPagoController::class, 'pending'])->name('mercadopago.pending');
-Route::get('/checkout/failure', [MercadoPagoController::class, 'failure'])->name('mercadopago.failure');
 
 require __DIR__.'/auth.php';
