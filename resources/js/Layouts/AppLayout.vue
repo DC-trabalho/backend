@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
@@ -7,12 +7,16 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import Footer from '@/Components/Footer.vue';
 
 const page = usePage();
-const user = page.props.auth?.user;
 
 const props = defineProps({
     title: String,
+    hasPaddingTop: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const showingNavigationDropdown = ref(false);
@@ -130,7 +134,7 @@ const clearResults = () => {
                                 </NavLink>
                                 <NavLink :class="{ 'hidden': !route().current('home') }"
                                     :href="route('home') + '#categorias'"
-                                    :active="isOnhome && activeSection === 'categorias'">
+                                    :active="isOnome && activeSection === 'categorias'">
                                     Categorias
                                 </NavLink>
                                 <NavLink :class="{ 'hidden': !route().current('home') }"
@@ -139,8 +143,7 @@ const clearResults = () => {
                                     Personagens
                                 </NavLink>
                                 <NavLink :class="{ 'hidden': !route().current('home') }"
-                                    :href="route('home') + '#sobre'"
-                                    :active="isOnHome && activeSection === 'sobre'">
+                                    :href="route('home') + '#sobre'" :active="isOnHome && activeSection === 'sobre'">
                                     Sobre
                                 </NavLink>
                             </div>
@@ -151,7 +154,7 @@ const clearResults = () => {
                                 <div
                                     class="flex rounded-md bg-white dark:bg-gray-700 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
                                     <input v-model="searchQuery" @input="filterResults" @click="filterResults"
-                                        @blur="clearResults" type="text" placeholder="Search..."
+                                        @blur="clearResults" type="text" placeholder="Pesquise..."
                                         class="flex-grow dark:border-gray-600 border-gray-300 block w-full rounded-l-md bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:dark:border-gray-600 focus:ring-0 focus:border-gray-300 sm:text-sm p-2" />
                                     <button type="button"
                                         class="inline-flex dark:border-gray-600 border-l-0 border border-gray-300 items-center px-3 rounded-r-md bg-transparent text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 focus:outline-none">
@@ -176,7 +179,7 @@ const clearResults = () => {
                         </div>
 
                         <div class="hidden sm:flex md:ms-6 gap-x-2">
-                            <NavLink :href="route('home')" :active="route().current('home')"
+                            <NavLink :href="route('cart')" :active="route().current('cart')"
                                 class="hidden sm:inline-flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
                                     stroke="currentColor" class="h-6 w-6" width="24px" fill="currentColor">
@@ -198,11 +201,11 @@ const clearResults = () => {
 
                                     <template #content>
                                         <div class="block px-4 py-2 text-xs text-gray-400">
-                                            Manage Account
+                                            Sua conta
                                         </div>
 
                                         <DropdownLink :href="route('profile.show')">
-                                            Profile
+                                            Gerenciar Perfil
                                         </DropdownLink>
 
                                         <DropdownLink v-if="$page.props.jetstream.hasApiFeatures"
@@ -214,16 +217,17 @@ const clearResults = () => {
 
                                         <form @submit.prevent="logout">
                                             <DropdownLink as="button">
-                                                Log Out
+                                                Sair
                                             </DropdownLink>
                                         </form>
                                     </template>
                                 </Dropdown>
                             </div>
-                            <NavLink v-else :href="route('login')" :active="route().current('login')"
+                            <NavLink v-else :href="route('login')"
+                                :active="route().current('login') || route().current('register')"
                                 class="hidden sm:inline-flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
-                                    stroke="currentColor" class="size-8" fill="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" stroke="currentColor"
+                                    class="size-8" fill="currentColor">
                                     <path
                                         d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q53 0 100-15.5t86-44.5q-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160Zm0-360q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm0-60Zm0 360Z" />
                                 </svg>
@@ -287,41 +291,56 @@ const clearResults = () => {
                         </div>
 
                         <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('home')" :active="route().current('home')">
+                            <ResponsiveNavLink :href="route('cart')" :active="route().current('cart')">
                                 <div class="flex items-center px-4">
-
                                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
                                         width="24px" fill="currentColor">
                                         <path
                                             d="M240-80q-33 0-56.5-23.5T160-160v-480q0-33 23.5-56.5T240-720h80q0-66 47-113t113-47q66 0 113 47t47 113h80q33 0 56.5 23.5T800-640v480q0 33-23.5 56.5T720-80H240Zm0-80h480v-480h-80v80q0 17-11.5 28.5T600-520q-17 0-28.5-11.5T560-560v-80H400v80q0 17-11.5 28.5T360-520q-17 0-28.5-11.5T320-560v-80h-80v480Zm160-560h160q0-33-23.5-56.5T480-800q-33 0-56.5 23.5T400-720ZM240-160v-480 480Z" />
                                     </svg>
-                                    <span class="ms-3">Cart</span>
+                                    <span class="ms-3">Carrinho</span>
                                 </div>
                             </ResponsiveNavLink>
-                            <ResponsiveNavLink :href="route('profile.show')" :active="route().current('profile.show')">
-                                Profile
-                            </ResponsiveNavLink>
-
-                            <ResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures"
-                                :href="route('api-tokens.index')" :active="route().current('api-tokens.index')">
-                                API Tokens
-                            </ResponsiveNavLink>
-
-                            <form method="POST" @submit.prevent="logout">
-                                <ResponsiveNavLink as="button">
-                                    Log Out
+                            <div v-if="$page.props.auth.user">
+                                <ResponsiveNavLink :href="route('profile.show')"
+                                    :active="route().current('profile.show')">
+                                    Gerenciar Perfil
                                 </ResponsiveNavLink>
-                            </form>
 
+                                <ResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures"
+                                    :href="route('api-tokens.index')" :active="route().current('api-tokens.index')">
+                                    API Tokens
+                                </ResponsiveNavLink>
+
+                                <form method="POST" @submit.prevent="logout">
+                                    <ResponsiveNavLink as="button">
+                                        Sair
+                                    </ResponsiveNavLink>
+                                </form>
+                            </div>
+                            <div v-else>
+                                <ResponsiveNavLink :href="route('login')"
+                                    :active="route().current('login') || route().current('register')">
+                                    <div class="flex items-center px-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+                                            width="24px" fill="currentColor">
+                                            <path
+                                                d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q53 0 100-15.5t86-44.5q-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160Zm0-360q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm0-60Zm0 360Z" />
+                                        </svg>
+                                        <span class="ms-3">Entrar</span>
+                                    </div>
+                                </ResponsiveNavLink>
+                            </div>
                         </div>
                     </div>
                 </div>
             </nav>
 
-            <main class="pt-16">
+            <main :class="[hasPaddingTop ? 'pt-16' : '', '2xl:max-w-7xl mx-auto']">
                 <slot />
-
             </main>
+
+            <Footer />
         </div>
     </div>
 </template>
