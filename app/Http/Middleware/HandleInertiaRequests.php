@@ -34,12 +34,12 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'laravelVersion' => app()->version(),
             'phpVersion' => PHP_VERSION,
-            /*
-            'ziggy' => fn () => [
+            
+            'ziggy' => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            */
+            
         ];
     }
 }

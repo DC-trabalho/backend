@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\UploadedFile;
-
+use Laravel\Fortify\Contracts\LoginResponse;
 
 class SocialAuthController extends Controller
 {
@@ -28,7 +28,7 @@ class SocialAuthController extends Controller
         }
     }
 
-    public function handleProviderCallback($provider)
+    public function handleProviderCallback($provider, LoginResponse $loginResponse)
     {
         try {
             if (!array_key_exists($provider, config('services'))) {
@@ -71,7 +71,7 @@ class SocialAuthController extends Controller
 
             Auth::login($user, true);
 
-            return redirect()->route('dashboard');
+            return $loginResponse->toResponse(request());
         } catch (\Exception $e) {
             return redirect('/login')->withErrors([
                 'auth' => 'Erro ao autenticar com ' . ucfirst($provider) . '. Tente novamente.'
