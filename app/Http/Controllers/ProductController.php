@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -12,7 +13,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('variations')->latest()->paginate(20);
+        $products = Product::with(['variations', 'categories'])->latest()->paginate(20);
 
         return Inertia::render('Products/Index', [
             'products' => $products,
@@ -21,16 +22,22 @@ class ProductController extends Controller
 
     public function create()
     {
-        return Inertia::render('Products/Create');
+        $categories = Category::orderBy('name')->get();
+
+        return Inertia::render('Products/Create', [
+            'categories' => $categories,
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:categories,id',
             'variations' => 'required|array',
             'variations.*.colour' => 'required|string',
             'variations.*.image' => 'required|image',
@@ -38,20 +45,22 @@ class ProductController extends Controller
 
         $product = Product::create([
             'id' => (string) Str::uuid(),
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price,
-            'stock' => $request->stock,
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'stock' => $validated['stock'],
         ]);
 
-        foreach ($request->variations as $variation) {
-            $image = $variation['image'];
-            $path = $image->store("products/{$product->id}", 'public');
-
+        foreach ($validated['variations'] as $variation) {
+            $path = $variation['image']->store("products/{$product->id}", 'public');
             $product->variations()->create([
                 'colour' => $variation['colour'],
                 'image_path' => $path,
             ]);
+        }
+
+        if (!empty($validated['category_ids'])) {
+            $product->categories()->sync($validated['category_ids']);
         }
 
         return redirect()->route('products.index')->with('success', 'Produto criado com sucesso!');
@@ -59,7 +68,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load('variations');
+        $product->load(['variations', 'categories']);
 
         return Inertia::render('Products/Show', [
             'product' => $product,
@@ -68,10 +77,12 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $product->load('variations');
+        $product->load(['variations', 'categories']);
+        $categories = Category::orderBy('name')->get();
 
         return Inertia::render('Products/Edit', [
             'product' => $product,
+            'categories' => $categories,
         ]);
     }
 
@@ -82,6 +93,8 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,id',
             'variations' => 'required|array',
             'variations.*.colour' => 'required|string',
             'variations.*.image' => 'nullable|image',
@@ -92,15 +105,12 @@ class ProductController extends Controller
 
         foreach ($validated['variations'] as $data) {
             if (isset($data['id'])) {
-                $variation = $product->variations()->where('id', $data['id'])->first();
+                $variation = $product->variations()->find($data['id']);
                 if ($variation) {
                     $variation->colour = $data['colour'];
-
                     if (isset($data['image'])) {
-                        $path = $data['image']->store('variations', 'public');
-                        $variation->image_path = $path;
+                        $variation->image_path = $data['image']->store('variations', 'public');
                     }
-
                     $variation->save();
                 }
             } else {
@@ -112,14 +122,16 @@ class ProductController extends Controller
             }
         }
 
+        $product->categories()->sync($validated['categories'] ?? []);
+
         return redirect()->route('products.index')->with('success', 'Produto atualizado com sucesso.');
     }
 
     public function destroy(Product $product)
     {
-        $product->delete();
-
+        $product->categories()->detach(); 
         $product->variations()->delete();
+        $product->delete();
 
         return redirect()->route('products.index')->with('success', 'Produto e suas variações foram removidos com sucesso.');
     }

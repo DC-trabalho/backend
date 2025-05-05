@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, Head } from '@inertiajs/vue3';
 
 const props = defineProps({
     product: Object,
@@ -8,6 +8,9 @@ const props = defineProps({
 </script>
 
 <template>
+
+    <Head title="Detalhes do Produto" />
+
     <AppLayout>
         <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-6">
@@ -33,6 +36,15 @@ const props = defineProps({
                 <p class="text-gray-700 dark:text-gray-300 mb-2"><strong>Preço:</strong> R$ {{
                     Number(product.price).toFixed(2) }}</p>
                 <p class="text-gray-700 dark:text-gray-300 mb-4"><strong>Estoque:</strong> {{ product.stock }}</p>
+
+                <div v-if="product.categories && product.categories.length">
+                    <h4 class="text-md font-semibold text-gray-800 dark:text-white mb-2">Categorias:</h4>
+                    <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 mb-4">
+                        <li v-for="category in product.categories" :key="category.id">
+                            {{ category.name }}
+                        </li>
+                    </ul>
+                </div>
 
                 <div>
                     <h4 class="text-md font-semibold text-gray-800 dark:text-white mb-2">Variações:</h4>

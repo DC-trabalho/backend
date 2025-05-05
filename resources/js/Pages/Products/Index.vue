@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, Head } from '@inertiajs/vue3';
 
 const props = defineProps({
     products: Object
@@ -9,6 +9,8 @@ const props = defineProps({
 </script>
 
 <template>
+
+    <Head title="Produtos" />
     <AppLayout title="Produtos">
         <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg p-6">

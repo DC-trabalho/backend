@@ -16,7 +16,7 @@ class Category extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = ['name', 'banner', 'parent_id'];
+    protected $fillable = ['name', 'banner', 'parent_id', 'image_path'];
 
     public function parent()
     {
@@ -27,5 +27,9 @@ class Category extends Model
     {
         return $this->hasMany(Category::class, 'parent_id');
     }
-}
 
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'category_product');
+    }
+}

@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, Head } from '@inertiajs/vue3';
 
 const props = defineProps({
     category: Object,
@@ -8,6 +8,8 @@ const props = defineProps({
 </script>
 
 <template>
+    <Head title="Detalhes da Categoria" />
+
     <AppLayout title="Detalhes da Categoria">
         <div class="py-10 max-w-5xl mx-auto sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-6">
@@ -27,12 +29,19 @@ const props = defineProps({
             </div>
 
             <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg p-6 space-y-4">
-                <div v-if="category.banner">
-                    <img :src="`/storage/${category.banner}`" alt="Banner da Categoria"
-                        class="rounded w-full h-48 object-cover mb-4" />
+                <div class="space-y-4">
+                    <div v-if="category.banner">
+                        <img :src="`/storage/${category.banner}`" alt="Banner da Categoria"
+                            class="rounded w-full h-48 object-cover mb-2" />
+                    </div>
+
+                    <div v-if="category.image_path">
+                        <img :src="`/storage/${category.image_path}`" alt="Foto da Categoria"
+                            class="rounded w-48 h-48 object-cover border mx-auto" />
+                    </div>
                 </div>
 
-                <div>
+                <div class="mt-6">
                     <p class="text-gray-700 dark:text-gray-300"><strong>Nome:</strong> {{ category.name }}</p>
                 </div>
 

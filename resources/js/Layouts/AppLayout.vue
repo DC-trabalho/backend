@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { Head, Link, router, } from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
 import Dropdown from '@/Components/Dropdown.vue';
@@ -8,8 +8,8 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import Footer from '@/Components/Footer.vue';
-
-const page = usePage();
+import { debounce } from 'lodash';
+import { route } from 'ziggy-js';
 
 const props = defineProps({
     title: String,
@@ -25,85 +25,32 @@ const logout = () => {
     router.post(route('logout'));
 };
 
-const activeSection = ref('')
-const isOnHome = ref(false)
-
-onMounted(() => {
-    const page = usePage()
-    isOnHome.value = page.component === 'Home'
-
-    if (!isOnHome.value) return
-
-    const sections = ['categorias', 'personagens', 'sobre']
-    const observer = new IntersectionObserver(
-        (entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    activeSection.value = entry.target.id
-                }
-            })
-        },
-        { threshold: 0.6 }
-    )
-
-    sections.forEach((id) => {
-        const el = document.getElementById(id)
-        if (el) observer.observe(el)
-    })
-
-    onBeforeUnmount(() => {
-        observer.disconnect()
-    })
-})
-
-const isScrolled = ref(false)
-
-const handleScroll = () => {
-    isScrolled.value = window.scrollY > 0
-}
-
-onMounted(() => {
-    window.addEventListener('scroll', handleScroll)
-    handleScroll()
-})
-
-onBeforeUnmount(() => {
-    window.removeEventListener('scroll', handleScroll)
-})
-
-//////////////
 const searchQuery = ref('');
 const searchResults = ref([]);
 
-const allItems = [
-    'Dashboard',
-    'Profile',
-    'Settings',
-    'API Tokens',
-    'Logout',
-    'Team Management',
-    'Notifications',
-    'Billing',
-    'Security',
-    'Reports',
-    'Analytics'
-];
-
-const filterResults = () => {
+const fetchSearchResults = async () => {
     if (searchQuery.value.trim() === '') {
         searchResults.value = [];
         return;
     }
-    searchResults.value = allItems.filter(item =>
-        item.toLowerCase().includes(searchQuery.value.toLowerCase())
-    );
+
+    try {
+        const response = await fetch(`/search?query=${searchQuery.value}`);
+        const data = await response.json();
+
+        searchResults.value = data;
+    } catch (error) {
+        console.error('Erro ao buscar resultados:', error);
+    }
 };
+
+const debounceSearch = debounce(fetchSearchResults, 300);
 
 const clearResults = () => {
-    searchResults.value = [];
+    setTimeout(() => {
+        searchResults.value = [];
+    }, 300);
 };
-//////////////
-
 </script>
 
 <template>
@@ -132,19 +79,16 @@ const clearResults = () => {
                                 <NavLink :href="route('home')" :active="route().current('home')">
                                     Home
                                 </NavLink>
-                                <NavLink :class="{ 'hidden': !route().current('home') }"
-                                    :href="route('home') + '#categorias'"
-                                    :active="isOnome && activeSection === 'categorias'">
+                                <NavLink :href="route('home') + '#sobre'">
+                                    Sobre
+                                </NavLink>
+                                <NavLink v-if="$page.props.auth.user && $page.props.auth.user.type === 'admin'"
+                                    :href="route('categories.index')" :active="route().current('categories.index')">
                                     Categorias
                                 </NavLink>
-                                <NavLink :class="{ 'hidden': !route().current('home') }"
-                                    :href="route('home') + '#personagens'"
-                                    :active="isOnHome && activeSection === 'personagens'">
-                                    Personagens
-                                </NavLink>
-                                <NavLink :class="{ 'hidden': !route().current('home') }"
-                                    :href="route('home') + '#sobre'" :active="isOnHome && activeSection === 'sobre'">
-                                    Sobre
+                                <NavLink v-if="$page.props.auth.user && $page.props.auth.user.type === 'admin'"
+                                    :href="route('products.index')" :active="route().current('products.index')">
+                                    Produtos
                                 </NavLink>
                             </div>
                         </div>
@@ -153,7 +97,7 @@ const clearResults = () => {
                             <div class="relative w-full max-w-lg">
                                 <div
                                     class="flex rounded-md bg-white dark:bg-gray-700 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
-                                    <input v-model="searchQuery" @input="filterResults" @click="filterResults"
+                                    <input v-model="searchQuery" @input="debounceSearch" @click="debounceSearch"
                                         @blur="clearResults" type="text" placeholder="Pesquise..."
                                         class="flex-grow dark:border-gray-600 border-gray-300 block w-full rounded-l-md bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:dark:border-gray-600 focus:ring-0 focus:border-gray-300 sm:text-sm p-2" />
                                     <button type="button"
@@ -170,8 +114,10 @@ const clearResults = () => {
                                     class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg">
                                     <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                                         <li v-for="(result, index) in searchResults" :key="index"
-                                            class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer">
-                                            {{ result }}
+                                            class="hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer">
+                                            <Link :href="route('product', result.id)" class="px-4 py-2 block w-full h-full">
+                                            {{ result.name }}
+                                            </Link>
                                         </li>
                                     </ul>
                                 </div>
@@ -259,16 +205,7 @@ const clearResults = () => {
                         <ResponsiveNavLink :href="route('home')" :active="route().current('home')">
                             Home
                         </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('home') + '#categorias'"
-                            :active="isOnHome && activeSection === 'categorias'">
-                            Categorias
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('home') + '#personagens'"
-                            :active="isOnHome && activeSection === 'personagens'">
-                            Personagens
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('home') + '#sobre'"
-                            :active="isOnHome && activeSection === 'sobre'">
+                        <ResponsiveNavLink :href="route('home') + '#sobre'">
                             Sobre
                         </ResponsiveNavLink>
                     </div>

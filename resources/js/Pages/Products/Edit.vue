@@ -10,10 +10,11 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import ActionMessage from '@/Components/ActionMessage.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import { ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, Head } from '@inertiajs/vue3';
 
 const props = defineProps({
     product: Object,
+    categories: Array,
 });
 
 const form = useForm({
@@ -22,6 +23,7 @@ const form = useForm({
     description: props.product.description,
     price: props.product.price,
     stock: props.product.stock,
+    categories: props.product.categories.map(c => c.id),
     variations: props.product.variations.map(v => ({
         id: v.id,
         colour: v.colour,
@@ -62,6 +64,9 @@ const submit = () => {
     data.append('price', form.price);
     data.append('stock', form.stock);
 
+    form.categories.forEach(categoryId => {
+        data.append('categories[]', categoryId);
+    });
     form.variations.forEach((v, i) => {
         if (v.id) data.append(`variations[${i}][id]`, v.id);
         data.append(`variations[${i}][colour]`, v.colour);
@@ -85,6 +90,9 @@ const deleteProduct = () => {
 </script>
 
 <template>
+
+    <Head title="Editar Produto" />
+
     <AppLayout title="Editar Produto">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -94,9 +102,6 @@ const deleteProduct = () => {
 
         <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
             <FormSection @submitted="submit">
-                <template #title>Informações do Produto</template>
-
-                <template #description>Atualize os dados do produto e suas variações.</template>
 
                 <template #form>
                     <div class="col-span-6 sm:col-span-4">
@@ -122,6 +127,17 @@ const deleteProduct = () => {
                         <InputLabel for="stock" value="Estoque" />
                         <TextInput id="stock" v-model="form.stock" type="number" class="mt-1 block w-full" />
                         <InputError :message="form.errors.stock" class="mt-2" />
+                    </div>
+
+                    <div class="col-span-6 sm:col-span-4">
+                        <InputLabel for="categories" value="Categorias" />
+                        <select id="categories" v-model="form.categories" multiple
+                            class="mt-1 block w-full h-32 border-gray-300 rounded-md">
+                            <option v-for="category in categories" :key="category.id" :value="category.id">
+                                {{ category.name }}
+                            </option>
+                        </select>
+                        <InputError :message="form.errors.categories" class="mt-2" />
                     </div>
 
                     <SectionBorder class="col-span-6" />

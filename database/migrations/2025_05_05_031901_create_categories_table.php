@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->string('name');
             $table->string('banner')->nullable(); 
             $table->uuid('parent_id')->nullable();
+            $table->string('image_path')->nullable();
             $table->foreign('parent_id')->references('id')->on('categories')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();

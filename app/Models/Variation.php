@@ -20,8 +20,4 @@ class Variation extends Model
     {
         return $this->belongsTo(Product::class);
     }
-    public function getImageUrlAttribute()
-    {
-        return asset('storage/' . $this->image_path);
-    }
 }
