@@ -11,6 +11,7 @@
         @routes
         @vite(['resources/js/app.js'])
         @inertiaHead
+        @laravelPWA
         <script>
 
         </script>
