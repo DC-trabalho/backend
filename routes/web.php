@@ -33,7 +33,7 @@ Route::get('/', function () {
 
     $categoriesWithMostChildren = Category::withCount('children')
         ->with('children')
-        ->where('children_count', '>', 0)
+        ->has('children', '>', 0)
         ->orderByDesc('children_count')
         ->get()
         ->filter(function ($cat) use (&$usedCategoryIds) {
@@ -58,7 +58,7 @@ Route::get('/', function () {
 
     $categoriesWithMostProducts = Category::withCount('products')
         ->with(['products.variations' => fn($q) => $q->orderBy('id')])
-        ->where('products_count', '>', 0)
+        ->has('products', '>', 0)
         ->orderByDesc('products_count')
         ->get()
         ->filter(function ($cat) use (&$usedCategoryIds) {
