@@ -8,10 +8,8 @@
     <link rel="icon" href="/assets/icons/logo.svg" type="image/svg+xml">
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
     
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
-    <meta name="theme-color" content="#ffffff" />
-
     <!-- Scripts -->
+     @laravelPWA
     @routes
     @vite(['resources/js/app.js'])
     @inertiaHead
