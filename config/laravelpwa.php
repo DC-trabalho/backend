@@ -1,16 +1,16 @@
 <?php
 
 return [
-    'name' => 'LaravelPWA',
+    'name' => 'e-DC',
     'manifest' => [
         'name' => env('APP_NAME', 'My PWA App'),
-        'short_name' => 'PWA',
+        'short_name' => 'e-DC',
         'start_url' => '/',
         'background_color' => '#ffffff',
         'theme_color' => '#000000',
         'display' => 'standalone',
-        'orientation'=> 'any',
-        'status_bar'=> 'black',
+        'orientation' => 'any',
+        'status_bar' => 'black',
         'icons' => [
             '72x72' => [
                 'path' => '/images/icons/icon-72x72.png',
@@ -45,22 +45,29 @@ return [
                 'purpose' => 'any'
             ],
         ],
-        'shortcuts' => [
-            [
-                'name' => 'Carrinho',
-                'description' => 'Acesse seu carrinho de compras',
-                'url' => '/cart',
-                'icons' => [
-                    "src" => "/images/icons/icon-72x72.png",
-                    "purpose" => "any"
-                ]
-            ]
-        ],
         'custom' => [
+            'id' => '?pwa',
+            'description' => 'Mergulhe no mundo dos super-heróis com a loja da DC Comics!',
+
+            'shortcuts' => [
+                [
+                    'name' => 'Carrinho',
+                    'description' => 'Acesse seu carrinho de compras',
+                    'url' => '/cart',
+                    'icons' => [
+                        [
+                            'src' => '/images/icons/icon-96x96.png',
+                            'type' => 'image/png',
+                            'sizes' => '96x96',
+                            'purpose' => 'any'
+                        ]
+                    ]
+                ]
+            ],
             'screenshots' => [
                 [
-                    'src' => '/images/icons/icon-192x192.png',
-                    'sizes' => '192x192',
+                    'src' => '/images/icons/icon-384x384.png',
+                    'sizes' => '384x384',
                     'type' => 'image/png',
                     'form_factor' => 'narrow',
                 ],
@@ -72,7 +79,7 @@ return [
                 ]
             ]
 
-            
+
         ]
     ]
 ];
